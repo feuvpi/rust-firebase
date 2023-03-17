@@ -16,6 +16,7 @@ struct Response {
 
 #[tokio::main]
 async fn main() {
+    // -- mockup user
     let user = User {
         name: "Fred Pi".to_string(),
         age: 33,
@@ -26,3 +27,15 @@ async fn main() {
 }
 
 async fn set_user() -> Response {}
+
+// -- helper functions
+
+// -- convert string to response
+fn string_to_response(s: &str) -> Response {
+    serde_json::from_str(s).unwrap()
+}
+
+// -- convert string to a User struct
+fn string_to_user(s: &str) -> User {
+    serde_json::from_str(s).unwrap()
+}
