@@ -32,6 +32,13 @@ async fn set_user(firebase_client: &Firebase, user: &User) -> Response {
     return string_to_response(&_users.unwrap().data);
 }
 
+async fn get_users(firebase_client: &Firebase, user: &User) -> HashMap<String, User> {
+    let firebase = firebase_client.at("users");
+    let users = firebase.get::<HashMap<String, User>>().await;
+    println!("{:?}", users);
+    return users.unwrap();
+}
+
 // -- helper functions
 
 // -- convert string to response
