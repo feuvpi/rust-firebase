@@ -1,6 +1,6 @@
 use firebase_rs::*; // importing firebase_rs library
 use serde::{Deserialize, Serialize}; // importing serde serialization and deserialization traits
-use std::collections::HashMap; // importing HashMap for storing data
+use std::{collections::HashMap, future}; // importing HashMap for storing data
 
 // -- define User struct with name, age, and email fields
 #[derive(Serialize, Deserialize, Debug)]
@@ -50,6 +50,12 @@ async fn get_users(firebase_client: &Firebase, user: &User) -> HashMap<String, U
     println!("{:?}", users);
     // -- return the retrieved user data as a HashMap
     return users.unwrap();
+}
+
+async fn get_user(firebase_client: &Firebase, id: &String) -> User {
+    let firebase = firebase_client.at("users").at(&id);
+    let user = firebase.get::<User>().await;
+    return user.unwrap();
 }
 
 // -- helper functions
