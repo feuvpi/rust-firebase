@@ -58,6 +58,12 @@ async fn get_user(firebase_client: &Firebase, id: &String) -> User {
     return user.unwrap();
 }
 
+async fn update_user(firebase_client: &Firebase, id: &String, user: &User) -> User {
+    let firebase = firebase_client.at("users").at(&id);
+    let _user = firebase.update::<User>(&user).await;
+    return string_to_user(&_user.unwrap().data);
+}
+
 // -- helper functions
 
 // -- convert string to response
