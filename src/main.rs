@@ -28,6 +28,12 @@ async fn main() {
 
     // -- create a new Firebase instance with the Firebase database URL
     let firebase = Firebase::new("https://rust-firebase-default-rtdb.firebaseio.com/").unwrap();
+
+    let response = set_user(&firebase, &user).await;
+
+    let mut user = get_user(&firebase, &response.name).await;
+
+    let users = get_users(&firebase).await;
 }
 
 // -- define async set_user function that sets user data in Firebase
