@@ -1,10 +1,13 @@
+use dotenv::dotenv;
 use firebase_rs::*; // importing firebase_rs library
 use serde::{Deserialize, Serialize}; // importing serde serialization and deserialization traits
 use std::{collections::HashMap, future}; // importing HashMap for storing data
+use tokio;
 
 // -- define User struct with name, age, and email fields
 #[derive(Serialize, Deserialize, Debug)]
 struct User {
+    id: Option<String>,
     name: String,
     age: u32,
     email: String,
@@ -13,7 +16,7 @@ struct User {
 // -- define Response struct with name field
 #[derive(Serialize, Deserialize, Debug)]
 struct Response {
-    name: String,
+    id: String,
 }
 
 // -- define async main function
@@ -21,19 +24,31 @@ struct Response {
 async fn main() {
     // -- mockup user
     let user = User {
+        id: None,
         name: "Fred Pi".to_string(),
         age: 33,
-        email: "frr228@gmail.com".to_string(),
+        email: "someemail@gmail.com".to_string(),
     };
 
+    let firebase_url = env::var("FIREBASE").unwrap();
     // -- create a new Firebase instance with the Firebase database URL
-    let firebase = Firebase::new("https://rust-firebase-default-rtdb.firebaseio.com/").unwrap();
+    let firebase = Firebase::new(&firebase_url).unwrap();
 
     let response = set_user(&firebase, &user).await;
+    println!("{:?}", response.name);
+    println!("{:?}", response.id);
 
-    let mut user = get_user(&firebase, &response.name).await;
+    let mut user = get_user(&firebase, &response.id).await;
 
-    let users = get_users(&firebase).await;
+    let users = get_users(&firebase, &response.id).await;
+    println!("{:?}", users);
+
+    user.email = "anotheremail@gmail.com".to_String();
+
+    let updated_user = update_user(&firebase, &response.id, &user).await;
+    println!("{:?}", updated_user);
+
+    delete_user(&firebase, &response.id).await;
 }
 
 // -- define async set_user function that sets user data in Firebase
